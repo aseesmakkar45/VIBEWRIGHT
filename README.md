@@ -1,4 +1,4 @@
-# VIBEWRITE
+# VIBEWRIGHT
 
 Team name: Code Rangers
 
