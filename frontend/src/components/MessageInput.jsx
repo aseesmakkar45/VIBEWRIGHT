@@ -1,9 +1,23 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Paperclip, Mic, ArrowUp, X, Rocket, Zap, MessageCircle, Square } from 'lucide-react';
+import { Paperclip, Mic, ArrowUp, X, Rocket, Zap, MessageCircle, Square, Flame, Sparkles, Brain } from 'lucide-react';
 import LightboxModal from './LightboxModal';
 import ModelSelector from './ModelSelector';
+import VibeSelector from './VibeSelector';
 
-const MessageInput = ({ activeChat, createNewChat, setAttachedFilesForChat, updateChatActivity, handleSendMessage, isChatActive, isGenerating, stopGeneration, selectedModel, setSelectedModel }) => {
+const MessageInput = ({ 
+  activeChat, 
+  createNewChat, 
+  setAttachedFilesForChat, 
+  updateChatActivity, 
+  handleSendMessage, 
+  isChatActive, 
+  isGenerating, 
+  stopGeneration, 
+  selectedModel, 
+  setSelectedModel,
+  selectedVibe,
+  setSelectedVibe 
+}) => {
   const [text, setText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [activeLightboxImage, setActiveLightboxImage] = useState(null);
@@ -27,7 +41,6 @@ const MessageInput = ({ activeChat, createNewChat, setAttachedFilesForChat, upda
   // Global Keyboard Capture ("Type-to-Chat")
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
-      // 2. Focus Exclusion Guardrails
       const activeElement = document.activeElement;
       if (
         activeElement && 
@@ -38,11 +51,9 @@ const MessageInput = ({ activeChat, createNewChat, setAttachedFilesForChat, upda
         return;
       }
 
-      // 3. Modifier & System Key Controls
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.key.length > 1) return; // Ignores Shift, Enter, Backspace, Arrow keys, etc.
+      if (e.key.length > 1) return;
 
-      // 4. Targeted Focus Pipeline
       if (textareaRef.current) {
         textareaRef.current.focus();
       }
@@ -58,7 +69,6 @@ const MessageInput = ({ activeChat, createNewChat, setAttachedFilesForChat, upda
     if (text.trim() || attachedFiles.length > 0) {
       handleSendMessage(text, attachedFiles);
       setText('');
-      // No need to manually clear files here as App.jsx clears them in global state for us.
     }
   };
 
@@ -88,7 +98,7 @@ const MessageInput = ({ activeChat, createNewChat, setAttachedFilesForChat, upda
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
       updateFiles(newFiles);
-      e.target.value = null; // reset input
+      e.target.value = null;
     }
   };
 
@@ -100,103 +110,101 @@ const MessageInput = ({ activeChat, createNewChat, setAttachedFilesForChat, upda
   };
 
   const handleFileClick = (file) => {
-    if (file.type.startsWith('image/')) {
-      setActiveLightboxImage(file);
+    if (file.type && file.type.startsWith('image/')) {
+      const objectUrl = URL.createObjectURL(file);
+      setActiveLightboxImage({ url: objectUrl, name: file.name });
     } else {
-      // Programmatic Download
-      const url = URL.createObjectURL(file);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const objectUrl = URL.createObjectURL(file);
+      const tempLink = document.createElement('a');
+      tempLink.href = objectUrl;
+      tempLink.download = file.name || 'downloaded_file';
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      document.body.removeChild(tempLink);
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 100);
     }
   };
 
   const handleMicClick = async () => {
     if (isRecording) {
-      // Stop recording
-      if (mediaRecorderRef.current) {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
         mediaRecorderRef.current.stop();
       }
       setIsRecording(false);
     } else {
-      // Start recording
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mediaRecorder = new MediaRecorder(stream);
-        mediaRecorderRef.current = mediaRecorder;
+        mediaRecorderRef.current = new MediaRecorder(stream);
         audioChunksRef.current = [];
 
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            audioChunksRef.current.push(event.data);
+        mediaRecorderRef.current.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            audioChunksRef.current.push(e.data);
           }
         };
 
-        mediaRecorder.onstop = () => {
-          const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' });
-          const audioFile = new File([audioBlob], 'voice_note.webm', { type: audioBlob.type });
-          
+        mediaRecorderRef.current.onstop = () => {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          const audioFile = new File([audioBlob], `voice_query_${Date.now()}.webm`, { type: 'audio/webm' });
           updateFiles([audioFile]);
-          
-          // Stop all tracks to release the microphone
           stream.getTracks().forEach(track => track.stop());
         };
 
-        mediaRecorder.start();
+        mediaRecorderRef.current.start();
         setIsRecording(true);
       } catch (err) {
-        console.error('Error accessing microphone:', err);
+        console.error('Microphone access denied:', err);
+        alert('Could not access microphone. Please ensure microphone permissions are granted.');
       }
     }
   };
 
-  const hasContent = text.trim().length > 0 || attachedFiles.length > 0 || isRecording;
+  const hasContent = text.trim().length > 0 || attachedFiles.length > 0;
 
   return (
-    <div className={`w-full max-w-3xl mx-auto transition-all duration-500 ease-in-out px-4 ${isChatActive ? 'pb-6' : 'translate-y-4'}`}>
-      
-      <LightboxModal 
-        imageFile={activeLightboxImage} 
-        onClose={() => setActiveLightboxImage(null)} 
-      />
+    <div className={`w-full max-w-4xl mx-auto px-4 ${isChatActive ? 'pb-4' : ''}`}>
+      {activeLightboxImage && (
+        <LightboxModal 
+          imageUrl={activeLightboxImage.url} 
+          fileName={activeLightboxImage.name} 
+          onClose={() => {
+            URL.revokeObjectURL(activeLightboxImage.url);
+            setActiveLightboxImage(null);
+          }} 
+        />
+      )}
 
-      <div className="relative bg-white shadow-sm border border-gray-200 rounded-3xl focus-within:ring-2 focus-within:ring-amber-500/20 focus-within:border-amber-400 transition-all flex flex-col">
+      {/* Input Container */}
+      <div className="bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-gray-200/80 p-2 transition-all duration-200 focus-within:shadow-[0_4px_25px_rgba(0,0,0,0.1)] focus-within:border-amber-400">
         
-        {/* Render Attached Files (Chips) */}
+        {/* Attached Files Chips Bar */}
         {attachedFiles.length > 0 && (
-          <div className="flex flex-wrap gap-2 px-3 pt-3 pb-1">
+          <div className="flex flex-wrap gap-2 p-2 border-b border-gray-100 mb-1">
             {attachedFiles.map((file, idx) => (
               <div 
                 key={idx} 
                 onClick={() => handleFileClick(file)}
-                className="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer animate-fade-in-up"
-                title="Click to view/download"
+                className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1 text-xs text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer group"
               >
                 <span className="truncate max-w-[150px]">{file.name}</span>
                 <button 
                   onClick={(e) => removeFile(idx, e)}
-                  className="text-gray-400 hover:text-gray-700 p-0.5 rounded-full transition-colors"
-                  title="Remove file"
+                  className="text-gray-400 hover:text-gray-600 rounded-full p-0.5"
                 >
-                  <X size={14} />
+                  <X size={12} />
                 </button>
               </div>
             ))}
           </div>
         )}
 
-        <div className="flex items-end p-2 min-h-[56px]">
-          {/* Hidden File Input */}
+        <div className="flex items-end gap-2">
+          {/* File Input Element */}
           <input 
             type="file" 
-            multiple 
             ref={fileInputRef} 
             onChange={handleFileChange} 
+            multiple 
             className="hidden" 
           />
           
@@ -204,6 +212,7 @@ const MessageInput = ({ activeChat, createNewChat, setAttachedFilesForChat, upda
           <button 
             onClick={() => fileInputRef.current?.click()}
             className="p-2.5 text-gray-400 hover:text-amber-600 rounded-full hover:bg-amber-50 transition-colors shrink-0"
+            title="Attach reference files (PDF, Markdown, CSV, TXT)"
           >
             <Paperclip size={20} />
           </button>
@@ -214,16 +223,15 @@ const MessageInput = ({ activeChat, createNewChat, setAttachedFilesForChat, upda
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask Elon anything — grounded in real tweets..."
-            className="flex-1 max-h-[300px] min-h-[40px] bg-transparent resize-none border-none focus:outline-none focus:ring-0 outline-none text-gray-800 placeholder-gray-400 py-2.5 px-2 overflow-y-auto"
+            placeholder="Ask Elon anything — tweet history, first principles, or crazy hypotheticals..."
+            className="flex-1 max-h-[300px] min-h-[40px] bg-transparent resize-none border-none focus:outline-none focus:ring-0 outline-none text-gray-800 placeholder-gray-400 py-2.5 px-2 overflow-y-auto font-sans"
             rows={1}
           />
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-1 shrink-0 px-1 pb-1">
-            <div className="mr-1">
-              <ModelSelector selectedModel={selectedModel} setSelectedModel={setSelectedModel} />
-            </div>
+          <div className="flex items-center gap-1.5 shrink-0 px-1 pb-1">
+            <VibeSelector selectedVibe={selectedVibe} setSelectedVibe={setSelectedVibe} />
+            <ModelSelector selectedModel={selectedModel} setSelectedModel={setSelectedModel} />
 
             {(!hasContent || isRecording) && !isGenerating && (
               <button 
@@ -235,7 +243,7 @@ const MessageInput = ({ activeChat, createNewChat, setAttachedFilesForChat, upda
                 }`}
                 title="Voice Input"
               >
-                <Mic size={20} className={isRecording ? 'animate-pulse text-red-500' : ''} />
+                <Mic size={18} className={isRecording ? 'animate-pulse text-red-500' : ''} />
               </button>
             )}
             
@@ -244,7 +252,7 @@ const MessageInput = ({ activeChat, createNewChat, setAttachedFilesForChat, upda
                 onClick={handleSubmit}
                 className="p-2.5 rounded-full transition-all bg-gray-900 text-white hover:bg-gray-800 scale-100"
               >
-                <ArrowUp size={20} />
+                <ArrowUp size={18} />
               </button>
             )}
 
@@ -254,7 +262,7 @@ const MessageInput = ({ activeChat, createNewChat, setAttachedFilesForChat, upda
                 className="p-2.5 rounded-full transition-all bg-gray-900 text-white hover:bg-gray-800 scale-100"
                 title="Stop Execution"
               >
-                <Square size={20} className="fill-current" />
+                <Square size={18} className="fill-current" />
               </button>
             )}
           </div>
@@ -263,32 +271,38 @@ const MessageInput = ({ activeChat, createNewChat, setAttachedFilesForChat, upda
       
       {/* Quick Action Pills (Landing State Only) */}
       {!isChatActive && (
-        <div className="flex flex-wrap items-center justify-center gap-3 mt-6 animate-fade-in-up">
+        <div className="flex flex-wrap items-center justify-center gap-2.5 mt-6 animate-fade-in-up">
           <button 
             onClick={() => handlePillClick("What are your thoughts on settling Mars?")}
-            className="bg-white hover:bg-amber-50/50 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-600 transition-all cursor-pointer flex items-center gap-2 shadow-sm"
+            className="bg-white hover:bg-amber-50/70 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-700 font-medium transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
           >
-            <Rocket size={16} className="text-amber-500" /> What are your thoughts on settling Mars?
+            <Rocket size={14} className="text-amber-500" /> Mars & Starship Timelines
           </button>
           <button 
-            onClick={() => handlePillClick("What do you think about AI safety?")}
-            className="bg-white hover:bg-amber-50/50 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-600 transition-all cursor-pointer flex items-center gap-2 shadow-sm"
+            onClick={() => handlePillClick("How would you optimize a pizza delivery chain using first principles?")}
+            className="bg-white hover:bg-amber-50/70 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-700 font-medium transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
           >
-            <Zap size={16} className="text-amber-500" /> What do you think about AI safety?
+            <Zap size={14} className="text-blue-500" /> First Principles: Pizza Delivery (Out-of-Dataset)
           </button>
           <button 
-            onClick={() => handlePillClick("Tell me about free speech and X")}
-            className="bg-white hover:bg-amber-50/50 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-600 transition-all cursor-pointer flex items-center gap-2 shadow-sm"
+            onClick={() => handlePillClick("If you were teleported to the Middle Ages, what technology do you build first?")}
+            className="bg-white hover:bg-amber-50/70 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-700 font-medium transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
           >
-            <MessageCircle size={16} className="text-amber-500" /> Tell me about free speech and X
+            <Sparkles size={14} className="text-purple-500" /> Middle Ages Survival Hypothetical
+          </button>
+          <button 
+            onClick={() => handlePillClick("Are we living in a computer simulation?")}
+            className="bg-white hover:bg-amber-50/70 border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-700 font-medium transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+          >
+            <Brain size={14} className="text-emerald-500" /> Simulation Hypothesis & Memes
           </button>
         </div>
       )}
 
       {/* Disclaimer / Hints */}
-      <div className="text-center mt-4">
-        <p className="text-xs text-gray-400">
-          Responses are grounded in Elon Musk's real tweets. AI can make mistakes.
+      <div className="text-center mt-3">
+        <p className="text-[11px] text-gray-400">
+          Cloned with authentic style, tone, cadence, and first-principles mental models.
         </p>
       </div>
     </div>

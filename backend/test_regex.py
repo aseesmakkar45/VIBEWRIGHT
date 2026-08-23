@@ -1,26 +1,18 @@
-import fitz
 import re
 
-pdf_path = "d:/PYTHON LOL/Hackathon Ideas/PersonaTwin.AI/backend/data/THE MOTOR VEHICLES ACT, 1988.pdf"
-doc = fitz.open(pdf_path)
-full_text = ""
-for page in doc:
-    full_text += page.get_text("text") + "\n"
+queries = [
+    "What do you think about the latest OpenAI model released yesterday?",
+    "Tell me about the new SpaceX rocket",
+    "What is there to say about Newton's third law?",
+    "what are your thoughts on settling Mars?"
+]
 
-# Try original pattern
-split_pattern1 = r'(?=\b(?:Section|Article)\s+\d+[A-Z]?\b)'
-chunks1 = re.split(split_pattern1, full_text, flags=re.IGNORECASE)
+for q in queries:
+    objective = q.lower()
+    objective = re.sub(r'\b(what do you think about|what are your thoughts on|can you explain|tell me about|what is|who is|the|latest|new)\b', '', objective)
+    objective = re.sub(r'[?!]', '', objective)
+    search_query = " ".join(objective.split()).strip()
+    print(f"Original: {q}\nExtracted: {search_query}\n")
 
-# Try new pattern: newline, optional spaces, numbers, dot, space, Capital letter
-split_pattern2 = r'(?=\n\s*\d+[A-Z]?\.\s+[A-Z])'
-chunks2 = re.split(split_pattern2, full_text)
-
-print(f"Original pattern gave {len(chunks1)} chunks")
-print(f"New pattern gave {len(chunks2)} chunks")
-
-for c in chunks2:
-    if "protective headgear" in c.lower():
-        with open("chunk_output.txt", "w", encoding="utf-8") as f:
-            f.write(c[:1000])
-        print("Found protective headgear chunk! Saved to chunk_output.txt")
-        break
+    has_current_signals = bool(re.search(r'\b(latest|new|news|yesterday|today|recent|current|this week)\b', q.lower()))
+    print(f"Current Signals: {has_current_signals}\n---")

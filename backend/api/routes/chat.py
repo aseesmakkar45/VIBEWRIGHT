@@ -15,12 +15,13 @@ async def chat_stream(
     prompt: Optional[str] = Form(None, alias="text"),
     activeChatId: str = Form(..., alias="chatId"),
     model_requested: Optional[str] = Form(None),
+    vibe_mode: Optional[str] = Form("x_mode"),
     files: Optional[List[UploadFile]] = File(None)
 ):
     """
-    Endpoint for streaming the legal RAG response.
+    Endpoint for streaming the PersonaTwin RAG response.
     Accepts multipart/form-data from the React client.
-    Delegates the heavy lifting to the isolated RAG engine service.
+    Delegates the heavy lifting to the isolated RAG & Persona engine service.
     
     Note: The async generator pattern intrinsically handles 
     asyncio.CancelledError from the ASGI server when the client 
@@ -36,7 +37,6 @@ async def chat_stream(
         raise HTTPException(status_code=400, detail="Missing both text prompt and audio payload.")
         
     # Extract file byte streams
-    # If it's an audio file, transcode and transcribe it immediately.
     attached_documents = ""
     
     if files:
@@ -67,7 +67,7 @@ async def chat_stream(
                         yield "data: [DONE]\n\n"
                     return StreamingResponse(error_stream(), media_type="text/event-stream")
             else:
-                # Store non-audio files and extract text for document-based RAG
+                # Store non-audio files and extract text for document-based context
                 try:
                     extracted_text = ""
                     if f.filename.endswith('.pdf'):
@@ -78,7 +78,7 @@ async def chat_stream(
                     elif f.filename.lower().endswith(('.txt', '.md', '.csv', '.json', '.html', '.xml')):
                         extracted_text = content.decode('utf-8', errors='ignore')
                     else:
-                        extracted_text = f"[UNSUPPORTED FILE FORMAT: {f.filename}]. User uploaded a binary file. Trigger Rule 9."
+                        extracted_text = f"[ATTACHED FILE: {f.filename}]"
                         
                     if extracted_text.strip():
                         logger.info(f"📄 Successfully extracted text from document: {f.filename}")
@@ -88,6 +88,12 @@ async def chat_stream(
                     
     # Return the Server-Sent Events stream from the intelligence boundary
     return StreamingResponse(
-        generate_rag_stream(prompt=prompt, chat_id=activeChatId, attached_docs=attached_documents, model_requested=model_requested),
+        generate_rag_stream(
+            prompt=prompt, 
+            chat_id=activeChatId, 
+            attached_docs=attached_documents, 
+            model_requested=model_requested,
+            vibe_mode=vibe_mode or "x_mode"
+        ),
         media_type="text/event-stream"
     )

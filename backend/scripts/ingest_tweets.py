@@ -24,8 +24,8 @@ def ingest_tweets():
     # Sort by likes to prioritize high-engagement tweets if we sample
     df = df.sort_values(by="likeCount", ascending=False)
     
-    # Take top 10000 tweets for speed in this hackathon
-    df = df.head(10000)
+    # Take top 30000 tweets for better style representation
+    df = df.head(30000)
     
     print(f"Loaded {len(df)} tweets for ingestion.")
     
@@ -57,10 +57,18 @@ def ingest_tweets():
     
     for idx, row in df.iterrows():
         docs.append(str(row['fullText']))
+        
+        is_reply = False
+        if pd.notna(row.get('isReply')):
+            val = str(row['isReply']).lower()
+            is_reply = (val == 'true' or val == '1.0' or val == '1')
+            
         metadatas.append({
             "createdAt": str(row['createdAt']),
             "likes": int(row['likeCount'] or 0),
-            "retweets": int(row['retweetCount'] or 0)
+            "retweets": int(row['retweetCount'] or 0),
+            "is_reply": is_reply,
+            "length": len(str(row['fullText']))
         })
         ids.append(f"tweet_{row['id']}")
         

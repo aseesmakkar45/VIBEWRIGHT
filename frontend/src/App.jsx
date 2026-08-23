@@ -13,6 +13,14 @@ function App() {
   useEffect(() => {
     localStorage.setItem('legalAiSelectedModel', selectedModel);
   }, [selectedModel]);
+
+  const [selectedVibe, setSelectedVibe] = useState(() => {
+    return localStorage.getItem('legalAiSelectedVibe') || "x_mode";
+  });
+  
+  useEffect(() => {
+    localStorage.setItem('legalAiSelectedVibe', selectedVibe);
+  }, [selectedVibe]);
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
@@ -100,6 +108,7 @@ function App() {
       formData.append('text', text);
       formData.append('chatId', chatId);
       formData.append('model_requested', selectedModel);
+      formData.append('vibe_mode', selectedVibe);
       if (files && files.length > 0) {
         files.forEach(f => formData.append('files', f));
       }
@@ -356,6 +365,8 @@ function App() {
         stopGeneration={() => stopGeneration(activeChatId)}
         selectedModel={selectedModel}
         setSelectedModel={setSelectedModel}
+        selectedVibe={selectedVibe}
+        setSelectedVibe={setSelectedVibe}
       />
 
       {/* Global Drag Overlay */}

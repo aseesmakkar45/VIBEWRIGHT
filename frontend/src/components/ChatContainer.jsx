@@ -35,7 +35,9 @@ const ChatContainer = ({
   isGenerating,
   stopGeneration,
   selectedModel,
-  setSelectedModel
+  setSelectedModel,
+  selectedVibe,
+  setSelectedVibe
 }) => {
   const [greeting, setGreeting] = useState('');
   const [editingMessageId, setEditingMessageId] = useState(null);
@@ -168,6 +170,8 @@ const ChatContainer = ({
               stopGeneration={stopGeneration}
               selectedModel={selectedModel}
               setSelectedModel={setSelectedModel}
+              selectedVibe={selectedVibe}
+              setSelectedVibe={setSelectedVibe}
             />
           </div>
         </div>
@@ -358,6 +362,8 @@ const ChatContainer = ({
           stopGeneration={stopGeneration}
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}
+          selectedVibe={selectedVibe}
+          setSelectedVibe={setSelectedVibe}
         />
       </div>
 
