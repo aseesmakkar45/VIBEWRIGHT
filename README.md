@@ -1,10 +1,12 @@
 <div align="center">
 
-# 🚀 VIBEWRITE (PersonaTwin.AI)
+# 🚀 VIBEWRIGHT (PersonaTwin.AI)
 
 ### Timeline-Grounded AI Persona & Conversational Digital Twin
 
 #### An interactive, multimodal AI digital twin engine grounded in real-world post history and timelines using Retrieval-Augmented Generation (RAG), LangGraph, and Google Gemma 4.
+
+### 🎥 [Watch the Live Demo & Pitch Video Here](https://drive.google.com/drive/folders/1EibN3f_KXpm2IH3N51PIC2vmBicsyOAH?usp=sharing)
 
 <p>
 
@@ -58,9 +60,13 @@
 
 # 📖 Project Overview
 
-**VIBEWRITE (PersonaTwin.AI)** is a real-time conversational AI system designed to faithfully replicate the voice, tone, opinions, and technical reasoning of persona digital twins—grounding responses in their actual timeline history and public posts rather than unverified hallucinations.
+**VIBEWRIGHT (PersonaTwin.ai)** is a highly authentic, interactive digital twin of Elon Musk, designed to dynamically simulate his unique conversational style and first-principles mental models. At its core, the application leverages an advanced Retrieval-Augmented Generation (RAG) pipeline powered by ChromaDB, which ingests a massive dataset of historical tweets. This allows the AI to ground its answers strictly in actual past statements rather than hallucinating facts. 
 
-By combining dense vector retrieval with structured graph orchestration and modern large language models, VIBEWRITE enables users to interact naturally via text, voice, and document uploads while ensuring responses remain anchored to authentic source statements.
+To ensure absolute tonal accuracy, the system introduces dynamic "Vibe Modes"—allowing users to seamlessly switch between the punchy, meme-heavy "X Mode," the hardcore engineering depth of "First Principles," and the expansive, philosophical "Visionary" scale. 
+
+The architecture is built on a high-performance FastAPI backend integrated with LangGraph for state management, while **Swytchcode** serves as the robust execution layer orchestrating Google's powerful Gemini models. To handle novel or current events, the application features an intelligent DuckDuckGo factual search fallback, smoothly blending real-time knowledge into the conversation without falsely attributing it to the persona’s past. 
+
+Crucially, we implemented an autonomous "Persona Critic" mechanism. Before streaming the response to our sleek, responsive React frontend, a secondary LLM evaluates the candidate output for stylistic consistency, appropriate length, and historical accuracy—automatically triggering revisions if the response feels like a forced caricature. The result is a profoundly realistic, voice-enabled AI companion.
 
 ### Key Highlights:
 - **Factually Grounded Persona**: Retrieves authentic timeline posts and statements before crafting replies.
@@ -145,12 +151,13 @@ Incoming queries pass into a compiled LangGraph workflow:
 2. **Context Retrieval**: Performs cosine similarity search against ChromaDB collections (`n_results=10`).
 3. **Prompt Injection**: Formats retrieved posts with timestamps and engagement context into a specialized system prompt.
 
-### 3. Model Routing & Generation
-The backend supports flexible model selection via Google GenAI SDK:
-- `Gemma 4 26B MoE` (`gemma-4-26b-a4b-it`)
-- `Gemma 4 31B Dense` (`gemma-4-31b-it`)
+### 3. Model Routing & Generation via Swytchcode
+The backend executes calls to Google's Gemini/Gemma models using **Swytchcode** as the robust execution integration layer. Before the response is finalized, an autonomous **Persona Critic** evaluates the candidate generation for tone, length, and historical accuracy, triggering a revision loop if the response fails stylistic checks. 
 
-### 4. Real-Time SSE Streaming
+### 4. External Factual Search (DuckDuckGo Fallback)
+If the query involves current events or topics outside the persona's dataset (determined by knowledge confidence scoring), a lightweight DuckDuckGo Lite search is triggered to inject real-time facts into the context, without falsely claiming the persona previously knew them.
+
+### 5. Real-Time SSE Streaming
 Responses are streamed incrementally over HTTP using Server-Sent Events (`text/event-stream`), delivering low latency and immediate UI updates.
 
 ---
