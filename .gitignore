@@ -1,0 +1,49 @@
+# ==============================
+# Environment & Secrets
+# ==============================
+.env
+.env.*
+!.env.example
+secrets/
+
+# ==============================
+# Python (FastAPI backend)
+# ==============================
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+.pytest_cache/
+
+# ==============================
+# Node / React frontend
+# ==============================
+node_modules/
+frontend/dist/
+frontend/build/
+npm-debug.log*
+
+# ==============================
+# Vector DB & Cache
+# ==============================
+chroma_db/
+.ingest_cache.json
+
+# ==============================
+# Data
+# ==============================
+# Ignore all PDFs and demo videos by default so you don't accidentally push large files
+*.mp4
+*.pdf
+# EXCEPTION: Allow the legal corpus PDFs to be tracked and pushed
+!backend/data/*.pdf
+
+# ==============================
+# Logs, OS & IDE Files
+# ==============================
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
