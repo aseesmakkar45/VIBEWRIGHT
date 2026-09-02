@@ -27,6 +27,26 @@ function App() {
   const [generatingChats, setGeneratingChats] = useState({});
   const abortControllersRef = useRef({});
 
+  // Theme Management
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('appTheme');
+    if (saved) return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('appTheme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
   const stopGeneration = (chatId) => {
     if (abortControllersRef.current[chatId]) {
       abortControllersRef.current[chatId].abort();
@@ -45,6 +65,7 @@ function App() {
     } else {
       document.title = "New Chat - PersonaTwin.ai";
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeChat?.title]);
 
   // Chat Management Methods
@@ -338,7 +359,7 @@ function App() {
   }, [handleDragOver, handleDragLeave, handleDrop]);
 
   return (
-    <div className="h-screen w-screen flex bg-marble overflow-hidden font-sans relative">
+    <div className="h-screen w-screen flex bg-main overflow-hidden font-sans relative">
       <Sidebar 
         isOpen={isSidebarOpen} 
         setIsOpen={setIsSidebarOpen} 
@@ -349,6 +370,8 @@ function App() {
         deleteChat={deleteChat}
         renameChat={renameChat}
         pinChat={pinChat}
+        theme={theme}
+        toggleTheme={toggleTheme}
       />
       <ChatContainer 
         activeChat={activeChat}
@@ -367,14 +390,15 @@ function App() {
         setSelectedModel={setSelectedModel}
         selectedVibe={selectedVibe}
         setSelectedVibe={setSelectedVibe}
+        theme={theme}
       />
 
       {/* Global Drag Overlay */}
       {isDragging && (
-        <div className="fixed inset-0 bg-[#fdfcf6]/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center border-4 border-dashed border-amber-200 m-4 rounded-xl pointer-events-none animate-fade-in">
+        <div className="fixed inset-0 bg-main/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center border-4 border-dashed border-accent/40 m-4 rounded-xl pointer-events-none animate-fade-in">
           <div className="flex flex-col items-center animate-scale-in">
-            <PlusCircle size={64} className="text-amber-500 mb-4 animate-bounce" />
-            <h2 className="text-3xl font-spectral font-medium text-gray-800">Drop your files to attach to this conversation</h2>
+            <PlusCircle size={64} className="text-accent mb-4 animate-bounce" />
+            <h2 className="text-3xl font-spectral font-medium text-tx-primary">Drop your files to attach to this neural link</h2>
           </div>
         </div>
       )}
