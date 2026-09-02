@@ -158,11 +158,8 @@ Open `http://localhost:5173` in your browser.
 
 To populate the local ChromaDB with the necessary timeline vectors, you must run the ingestion script. The repository expects a source data file named `all_musk_posts.csv` in the root directory.
 
-*Note: You will need to manually install `pandas` for this script, as it is excluded from the core API requirements.*
-
 ```bash
 cd backend
-pip install pandas
 python scripts/ingest_tweets.py
 ```
 
@@ -182,7 +179,6 @@ python test_bot.py
 
 - **Hardcoded Persona**: While designed conceptually as a "Digital Twin Engine", the current implementation is explicitly hardcoded to the Elon Musk persona. System prompts, ChromaDB collections (`elon_tweets`), and style metrics are deeply coupled to this specific identity.
 - **Dependencies**: 
-  - `pandas` must be installed manually for data ingestion.
   - The repository contains an unused legacy script (`backend/scripts/ingest_docs.py`) targeting Indian Legal PDFs, which is not part of the primary workflow.
 - **Model Aliases**: The backend router accepts requests for "Gemma 4 26B MoE" and "Gemma 4 31B Dense". These are passed as raw identifiers to the Google GenAI SDK. If you do not have access to these specific model weights via your GCP/Gemini account, you may need to adjust the `MODEL_ROUTER` dictionary in `services/rag_engine.py` to standard available models (e.g., `gemini-1.5-pro`).
 - **Voice Transcription**: The STT pipeline requires internet connectivity, as it uses Gemini 1.5 Flash via the GenAI SDK, rather than local Whisper inference.
