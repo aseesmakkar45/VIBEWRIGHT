@@ -99,13 +99,18 @@ const ChatContainer = ({
       {/* Top Toggle for Sidebar */}
       <div className="absolute top-4 left-4 z-10">
         {!isSidebarOpen && (
-          <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-tx-muted hover:text-tx-primary hover:bg-hover rounded-lg transition-colors bg-panel/50 backdrop-blur-md border border-bd-subtle shadow-sm">
-            <PanelLeftOpen size={20} />
+          <button 
+            onClick={() => setIsSidebarOpen(true)} 
+            aria-label="Open sidebar"
+            aria-expanded="false"
+            className="p-2 text-tx-muted hover:text-tx-primary hover:bg-hover rounded-lg transition-colors bg-panel/50 backdrop-blur-md border border-bd-subtle shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            <PanelLeftOpen size={20} aria-hidden="true" />
           </button>
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto relative flex flex-col items-center">
+      <main className="flex-1 overflow-y-auto relative flex flex-col items-center" aria-live="polite" role="log">
         
         {/* Landing State */}
         <div className={`w-full max-w-3xl px-4 flex flex-col justify-center min-h-full transition-all duration-700 ease-in-out ${isChatActive ? 'hidden' : 'flex'}`}>
@@ -229,38 +234,38 @@ const ChatContainer = ({
                 {/* Actions Toolbar */}
                 <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1">
                   {msg.role === 'user' && !editingMessageId && (
-                    <button onClick={() => startEditing(msg.id, msg.text)} className="p-1.5 text-tx-muted hover:text-accent rounded-md bg-panel/50 hover:bg-panel border border-transparent hover:border-bd-subtle transition-all" title="Edit Parameters">
-                      <Edit3 size={14} />
+                    <button onClick={() => startEditing(msg.id, msg.text)} className="p-1.5 text-tx-muted hover:text-accent rounded-md bg-panel/50 hover:bg-panel border border-transparent hover:border-bd-subtle transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" title="Edit Parameters" aria-label="Edit message">
+                      <Edit3 size={14} aria-hidden="true" />
                     </button>
                   )}
 
                   {msg.role === 'assistant' && msg.variants && msg.variants.length > 1 && (
                     <div className="flex items-center gap-1 mr-2 bg-panel/50 border border-bd-subtle rounded-md px-1 py-0.5 text-xs text-tx-muted font-medium select-none">
-                      <button onClick={() => switchVariant(activeChat.id, msg.id, -1)} disabled={msg.activeVariantIndex === 0} className="p-1 hover:text-tx-primary disabled:opacity-30 disabled:hover:text-tx-muted transition-colors">
-                        <ChevronLeft size={14} />
+                      <button onClick={() => switchVariant(activeChat.id, msg.id, -1)} disabled={msg.activeVariantIndex === 0} className="p-1 hover:text-tx-primary disabled:opacity-30 disabled:hover:text-tx-muted transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent" aria-label="Previous variant">
+                        <ChevronLeft size={14} aria-hidden="true" />
                       </button>
-                      <span className="px-1">{msg.activeVariantIndex + 1} / {msg.variants.length}</span>
-                      <button onClick={() => switchVariant(activeChat.id, msg.id, 1)} disabled={msg.activeVariantIndex === msg.variants.length - 1} className="p-1 hover:text-tx-primary disabled:opacity-30 disabled:hover:text-tx-muted transition-colors">
-                        <ChevronRight size={14} />
+                      <span className="px-1" aria-label={`Variant ${msg.activeVariantIndex + 1} of ${msg.variants.length}`}>{msg.activeVariantIndex + 1} / {msg.variants.length}</span>
+                      <button onClick={() => switchVariant(activeChat.id, msg.id, 1)} disabled={msg.activeVariantIndex === msg.variants.length - 1} className="p-1 hover:text-tx-primary disabled:opacity-30 disabled:hover:text-tx-muted transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent" aria-label="Next variant">
+                        <ChevronRight size={14} aria-hidden="true" />
                       </button>
                     </div>
                   )}
                   
                   {msg.text && msg.role === 'assistant' && !isGenerating && (
-                    <button onClick={() => regenerateResponse(activeChat.id, msg.id)} className="p-1.5 text-tx-muted hover:text-accent rounded-md bg-panel/50 hover:bg-panel border border-transparent hover:border-bd-subtle transition-all" title="Regenerate Output">
-                      <RefreshCw size={14} />
+                    <button onClick={() => regenerateResponse(activeChat.id, msg.id)} className="p-1.5 text-tx-muted hover:text-accent rounded-md bg-panel/50 hover:bg-panel border border-transparent hover:border-bd-subtle transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" title="Regenerate Output" aria-label="Regenerate response">
+                      <RefreshCw size={14} aria-hidden="true" />
                     </button>
                   )}
 
                   {msg.text && msg.role === 'assistant' && !isGenerating && (
-                    <button onClick={() => handleSpeak(msg.text)} className="p-1.5 text-tx-muted hover:text-accent rounded-md bg-panel/50 hover:bg-panel border border-transparent hover:border-bd-subtle transition-all" title="Synthesize Voice">
-                      <Volume2 size={14} />
+                    <button onClick={() => handleSpeak(msg.text)} className="p-1.5 text-tx-muted hover:text-accent rounded-md bg-panel/50 hover:bg-panel border border-transparent hover:border-bd-subtle transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" title="Synthesize Voice" aria-label="Read aloud">
+                      <Volume2 size={14} aria-hidden="true" />
                     </button>
                   )}
 
                   {msg.text && (
-                    <button onClick={() => handleCopy(msg.id, msg.text)} className="p-1.5 text-tx-muted hover:text-accent rounded-md bg-panel/50 hover:bg-panel border border-transparent hover:border-bd-subtle transition-all" title="Copy Output">
-                      {copiedMessageId === msg.id ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
+                    <button onClick={() => handleCopy(msg.id, msg.text)} className="p-1.5 text-tx-muted hover:text-accent rounded-md bg-panel/50 hover:bg-panel border border-transparent hover:border-bd-subtle transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" title="Copy Output" aria-label={copiedMessageId === msg.id ? "Copied" : "Copy message"}>
+                      {copiedMessageId === msg.id ? <Check size={14} className="text-green-500" aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
                     </button>
                   )}
                 </div>

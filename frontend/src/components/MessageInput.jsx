@@ -149,8 +149,8 @@ const MessageInput = ({
         <div className="flex items-end gap-2 relative">
           <input type="file" ref={fileInputRef} onChange={handleFileChange} multiple className="hidden" />
           
-          <button onClick={() => fileInputRef.current?.click()} className="p-3 text-tx-muted hover:text-accent rounded-full hover:bg-accent/10 transition-colors shrink-0 mb-1" title="Attach context (PDF, Code, Data)">
-            <Paperclip size={20} />
+          <button onClick={() => fileInputRef.current?.click()} className="p-3 text-tx-muted hover:text-accent rounded-full hover:bg-accent/10 transition-colors shrink-0 mb-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" title="Attach context (PDF, Code, Data)" aria-label="Attach context">
+            <Paperclip size={20} aria-hidden="true" />
           </button>
 
           <textarea
@@ -158,9 +158,10 @@ const MessageInput = ({
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Interrogate the clone..."
-            className="flex-1 max-h-[300px] min-h-[44px] bg-transparent resize-none border-none focus:outline-none focus:ring-0 outline-none text-tx-primary placeholder-tx-muted py-3 px-2 overflow-y-auto font-sans text-[15px]"
+            placeholder="Interrogate neural link..."
+            aria-label="Message input"
             rows={1}
+            className="flex-1 max-h-[300px] min-h-[44px] bg-transparent resize-none border-none focus:outline-none focus:ring-0 outline-none text-tx-primary placeholder-tx-muted py-3 px-2 overflow-y-auto font-sans text-[15px] focus-visible:ring-0"
           />
 
           <div className="flex items-center gap-2 shrink-0 pr-1 pb-1">
@@ -170,20 +171,20 @@ const MessageInput = ({
             </div>
 
             {(!hasContent || isRecording) && !isGenerating && (
-              <button onClick={handleMicClick} className={`p-3 rounded-full transition-all ${isRecording ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' : 'bg-input text-tx-muted hover:text-accent hover:bg-accent/10'}`} title="Voice Interrogation">
-                <Mic size={18} className={isRecording ? 'animate-pulse text-red-500' : ''} />
+              <button onClick={handleMicClick} className={`p-3 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ${isRecording ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' : 'bg-input text-tx-muted hover:text-accent hover:bg-accent/10 focus-visible:ring-accent'}`} title="Voice Interrogation" aria-label="Voice input">
+                <Mic size={18} className={isRecording ? 'animate-pulse text-red-500' : ''} aria-hidden="true" />
               </button>
             )}
             
             {hasContent && !isRecording && !isGenerating && (
-              <button onClick={handleSubmit} className="p-3 rounded-full transition-all bg-accent text-accent-text hover:bg-accent-hover shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+              <button onClick={handleSubmit} className="p-3 rounded-full transition-all bg-accent text-accent-text hover:bg-accent-hover shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent focus-visible:ring-offset-main" aria-label="Send message">
                 <ArrowUp size={18} strokeWidth={2.5} />
               </button>
             )}
 
             {isGenerating && (
-              <button onClick={stopGeneration} className="p-3 rounded-full transition-all bg-accent text-accent-text hover:bg-accent-hover shadow-md" title="Abort Execution">
-                <Square size={18} className="fill-current" />
+              <button onClick={stopGeneration} className="p-3 rounded-full transition-all bg-accent text-accent-text hover:bg-accent-hover shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-accent focus-visible:ring-offset-main" title="Abort Execution" aria-label="Stop generation">
+                <Square size={18} className="fill-current" aria-hidden="true" />
               </button>
             )}
           </div>

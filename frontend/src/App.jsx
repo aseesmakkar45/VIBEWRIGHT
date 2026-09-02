@@ -27,6 +27,22 @@ function App() {
   const [generatingChats, setGeneratingChats] = useState({});
   const abortControllersRef = useRef({});
 
+  // Mobile Detection
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth < 768) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Theme Management
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('appTheme');
@@ -372,6 +388,7 @@ function App() {
         pinChat={pinChat}
         theme={theme}
         toggleTheme={toggleTheme}
+        isMobile={isMobile}
       />
       <ChatContainer 
         activeChat={activeChat}
@@ -391,6 +408,7 @@ function App() {
         selectedVibe={selectedVibe}
         setSelectedVibe={setSelectedVibe}
         theme={theme}
+        isMobile={isMobile}
       />
 
       {/* Global Drag Overlay */}
