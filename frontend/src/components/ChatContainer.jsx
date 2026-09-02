@@ -23,7 +23,7 @@ class ErrorBoundary extends Component {
 const ChatContainer = ({ 
   activeChat, createNewChat, setAttachedFilesForChat, updateChatActivity, handleSendMessage,
   editMessageAndResubmit, regenerateResponse, switchVariant, isSidebarOpen, setIsSidebarOpen,
-  isGenerating, stopGeneration, selectedModel, setSelectedModel, selectedVibe, setSelectedVibe
+  isGenerating, stopGeneration, selectedModel, setSelectedModel, selectedVibe, setSelectedVibe, theme
 }) => {
   const [greeting, setGreeting] = useState('');
   const [editingMessageId, setEditingMessageId] = useState(null);

@@ -71,7 +71,7 @@ function App() {
   // Chat Management Methods
   const createNewChat = () => {
     const newChat = {
-      id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+      id: (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Date.now().toString(),
       title: 'New Chat',
       messages: [],
       attachedFiles: [],
@@ -207,8 +207,8 @@ function App() {
       targetChatId = createNewChat();
     }
     
-    const userMessageId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString() + '-u';
-    const assistantMessageId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString() + '-a';
+    const userMessageId = (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Date.now().toString() + '-u';
+    const assistantMessageId = (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Date.now().toString() + '-a';
     
     const userMessage = { id: userMessageId, role: 'user', text, files };
     const assistantMessage = { id: assistantMessageId, role: 'assistant', text: '', variants: [''], activeVariantIndex: 0 };
@@ -243,7 +243,7 @@ function App() {
         newMessages[msgIndex] = { ...newMessages[msgIndex], text: newText };
         
         // Setup new assistant message
-        const assistantMessageId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString() + '-a';
+        const assistantMessageId = (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Date.now().toString() + '-a';
         const assistantMessage = { id: assistantMessageId, role: 'assistant', text: '', variants: [''], activeVariantIndex: 0 };
         
         // Call API
