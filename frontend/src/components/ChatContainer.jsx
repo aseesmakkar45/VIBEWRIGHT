@@ -275,7 +275,7 @@ const ChatContainer = ({
           {/* Spacer for bottom input */}
           <div ref={bottomRef} className="h-4" />
         </div>
-      </div>
+      </main>
 
       {/* Docked Input */}
       <div className={`w-full flex justify-center bg-gradient-to-t from-main via-main to-transparent relative z-20 transition-all duration-700 ${isChatActive ? 'opacity-100 translate-y-0 pb-6 pt-4' : 'opacity-0 translate-y-10 pointer-events-none absolute bottom-0 left-0 right-0'}`}>
