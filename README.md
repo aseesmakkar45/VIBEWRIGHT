@@ -2,35 +2,23 @@
 
 # 🚀 VIBEWRIGHT (PersonaTwin.AI)
 
-### Timeline-Grounded AI Persona & Conversational Digital Twin
+### Factually Grounded Elon Musk AI Digital Twin
 
-#### An interactive, multimodal AI digital twin engine grounded in real-world post history and timelines using Retrieval-Augmented Generation (RAG), LangGraph, and Google Gemma 4.
+#### A real-time conversational AI system built to faithfully replicate the voice, technical reasoning, and opinions of Elon Musk, grounded in his historical X (Twitter) timeline using Retrieval-Augmented Generation (RAG) and LangGraph.
 
 ### 🎥 [Watch the Live Demo & Pitch Video Here](https://drive.google.com/drive/folders/1EibN3f_KXpm2IH3N51PIC2vmBicsyOAH?usp=sharing)
 
 <p>
 
-[![Primary LLM](https://img.shields.io/badge/Primary_LLM-Gemma_4-4285F4?style=for-the-badge&logo=google&logoColor=white)]()
+[![Primary LLM](https://img.shields.io/badge/Primary_LLM-Google_Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)]()
 [![Embedding](https://img.shields.io/badge/Embeddings-BGE--Base--EN-FF6F00?style=for-the-badge)]()
 [![Framework](https://img.shields.io/badge/Orchestration-LangGraph-1C3C3C?style=for-the-badge)]()
 [![Backend](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)]()
 [![Frontend](https://img.shields.io/badge/Frontend-React_19_+_Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black)]()
 [![Database](https://img.shields.io/badge/Vector_DB-ChromaDB-orange?style=for-the-badge)]()
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)]()
-[![License](https://img.shields.io/badge/License-BSD%203--Clause-yellow?style=for-the-badge)](LICENSE)
 
 </p>
-
----
-
-### ⚡ Timeline Grounding • Voice-First • Multimodal Document Ingestion • Real-Time SSE Streaming
-
-[Features](#-features) •
-[System Architecture](#-system-architecture) •
-[Tech Stack](#-tech-stack) •
-[Quickstart](#-quickstart-guide) •
-[Configuration](#-configuration) •
-[API Reference](#-api-reference)
 
 </div>
 
@@ -68,88 +56,80 @@ The architecture is built on a high-performance FastAPI backend integrated with 
 
 Crucially, we implemented an autonomous "Persona Critic" mechanism. Before streaming the response to our sleek, responsive React frontend, a secondary LLM evaluates the candidate output for stylistic consistency, appropriate length, and historical accuracy—automatically triggering revisions if the response feels like a forced caricature. The result is a profoundly realistic, voice-enabled AI companion.
 
-### Key Highlights:
-- **Factually Grounded Persona**: Retrieves authentic timeline posts and statements before crafting replies.
-- **Multimodal Interactions**: Record voice queries from the browser, drag-and-drop reference files (PDF, TXT, MD, CSV), or type standard prompts.
-- **Real-Time Token Streaming**: Streams generated tokens via Server-Sent Events (SSE) for instant feedback.
-- **Dynamic Multi-Session Chat**: Support for pinned chats, session renaming, message editing, branch regeneration, and local text-to-speech.
+It combines semantic retrieval via ChromaDB, stateful conversation orchestration via LangGraph, dynamic factual fallback via DuckDuckGo, and a rigorous "Persona Critic" evaluation step to ensure responses remain contextually accurate, factually grounded, and stylistically authentic.
 
 ---
 
-# ✨ Features
+## ✨ Current Capabilities
 
-### 👤 Interactive User Experience
-- **🎙️ Voice-First Input**: Record audio directly in-browser with automatic transcription through Whisper / multimodal STT.
-- **📄 Multimodal Document Attachment**: Upload PDFs, TXTs, or markdown notes to provide ad-hoc context alongside queries.
-- **⚡ Fluid Token Streaming**: Real-time response streaming with Markdown and code syntax highlighting.
-- **✏️ Message Editing & Branching**: Edit previous user turns to fork conversations and regenerate responses.
-- **📌 Multi-Chat Management**: Pin favorite sessions, rename topics, search history, and sort by recent activity.
-- **🔊 Read Aloud (TTS)**: Built-in browser speech synthesis to listen to replies hands-free.
+Based on the current implementation, VIBEWRITE provides:
 
-### 🧠 AI & Engineering Capabilities
-- **Semantic Vector Search**: High-dimensional embeddings with `BAAI/bge-base-en-v1.5` over ChromaDB collections.
-- **LangGraph State Orchestration**: Modular graph workflow isolating retrieval, state checkpoints, and generation.
-- **Model Router**: Dynamic switching between **Gemma 4 26B MoE** and **Gemma 4 31B Dense** models.
-- **FastAPI Async Gateway**: High-throughput asynchronous backend designed with clean boundary separation.
+- **Timeline Vector Grounding**: Retrieves historical posts, taking into account engagement metrics (likes) and timestamp metadata to form a context-rich prompt.
+- **Dynamic Vibe Modes**: Supports specific conversational profiles, including:
+  - **X Mode**: Concise, direct, and punchy.
+  - **First Principles**: Analytical, engineering-focused, and thermodynamic logic.
+  - **Visionary**: Broad civilizational and multi-planetary scale reasoning.
+- **Voice-First Input**: Supports browser-native voice recording, transcribed rapidly via Google Gemini Flash 1.5.
+- **Factual Fallback Engine**: If the internal vector search yields low confidence for a query, the system automatically runs an external DuckDuckGo factual search to prevent hallucination.
+- **Persona Critic Pipeline**: Responses pass through a secondary LLM evaluation phase (`gemini-3.6-flash`) to grade stylistic authenticity and enforce strict length constraints. If it fails, the response is revised before streaming to the user.
+- **Multimodal Document Parsing**: Users can upload `.pdf`, `.txt`, `.md`, or `.csv` files alongside prompts (parsed via PyMuPDF) to provide ad-hoc context to the AI.
+- **Real-Time Streaming**: Fast Server-Sent Events (SSE) streaming delivery to the React frontend.
 
 ---
 
-# 🏗 System Architecture
+## 🏗 System Architecture
+
+The application is split into a modern React 19 frontend and an asynchronous Python backend. 
 
 ```mermaid
 flowchart LR
 
 User["👤 User"]
 
-subgraph Frontend ["⚛️ React 19 + Vite Frontend"]
+subgraph Frontend ["React 19 + Vite"]
     Input["🎙️ Voice / 📄 Files / ⌨️ Text"]
-    UI["💬 Streaming Chat Container"]
-    State["🗂️ Session & History Management"]
+    UI["💬 SSE Chat Interface"]
 end
 
-subgraph Backend ["⚡ FastAPI Gateway"]
+subgraph Backend ["FastAPI Gateway"]
     Router["POST /api/chat/stream"]
-    AudioProc["🎙️ Audio Transcriber"]
-    DocProc["📄 PyMuPDF Document Parser"]
+    AudioProc["Gemini STT"]
+    DocProc["PyMuPDF Parser"]
 end
 
-subgraph Intelligence ["🧠 LangGraph & Vector Engine"]
-    Graph["LangGraph StateGraph"]
-    VectorDB[("📚 ChromaDB (Timeline Embeddings)")]
-    LLM["🤖 Google Gemma 4 (MoE / Dense)"]
+subgraph Intelligence ["LangGraph & Vector Engine"]
+    Graph["LangGraph Workflow"]
+    Search["🌐 DuckDuckGo Fallback"]
+    VectorDB[("ChromaDB\n(elon_tweets)")]
+    LLM["Google GenAI (Gemini)"]
+    Critic["Persona Critic"]
 end
 
 User --> Input
 Input --> Router
 Router --> AudioProc
 Router --> DocProc
-AudioProc --> Graph
-DocProc --> Graph
 Router --> Graph
 Graph --> VectorDB
-VectorDB --> Graph
-Graph --> LLM
-LLM --> Router
+VectorDB -.Low Confidence.-> Search
+VectorDB --> LLM
+Search --> LLM
+LLM --> Critic
+Critic --Revision--> LLM
+Critic --> Router
 Router --> UI
 UI --> User
 ```
 
+### Technology Stack
+- **Frontend**: React 19, Vite, Tailwind CSS v4.
+- **Backend API**: FastAPI, Uvicorn, Pydantic.
+- **Orchestration**: LangGraph, LangChain Core.
+- **AI Models**: Google GenAI SDK (Gemini series), with optional hooks for `swytchcode_runtime` execution.
+- **Vector Search**: ChromaDB, `BAAI/bge-base-en-v1.5` embeddings via SentenceTransformers.
+- **Document Parsing**: PyMuPDF (`fitz`).
+
 ---
-
-# 🔍 How It Works
-
-### 1. Timeline Vector Ingestion
-Historical posts and timeline data (`all_musk_posts.csv`) are filtered, indexed, and embedded using `BAAI/bge-base-en-v1.5`. Chunks preserve engagement metrics (likes, retweets, timestamps) in vector metadata for rich prompt grounding.
-
-```bash
-python backend/scripts/ingest_tweets.py
-```
-
-### 2. LangGraph Retrieval Pipeline
-Incoming queries pass into a compiled LangGraph workflow:
-1. **Query Ingestion**: Normalizes user text and any transcribed voice input.
-2. **Context Retrieval**: Performs cosine similarity search against ChromaDB collections (`n_results=10`).
-3. **Prompt Injection**: Formats retrieved posts with timestamps and engagement context into a specialized system prompt.
 
 ### 3. Model Routing & Generation via Swytchcode
 The backend executes calls to Google's Gemini/Gemma models using **Swytchcode** as the robust execution integration layer. Before the response is finalized, an autonomous **Persona Critic** evaluates the candidate generation for tone, length, and historical accuracy, triggering a revision loop if the response fails stylistic checks. 
@@ -160,170 +140,83 @@ If the query involves current events or topics outside the persona's dataset (de
 ### 5. Real-Time SSE Streaming
 Responses are streamed incrementally over HTTP using Server-Sent Events (`text/event-stream`), delivering low latency and immediate UI updates.
 
----
+### 1. Backend Setup
 
-# 🛠 Tech Stack
+```bash
+# Navigate to backend
+cd backend
 
-| Domain | Technology | Description |
-|---|---|---|
-| **Frontend** | React 19, Vite, Tailwind CSS | High-performance interactive UI with Lucide icons |
-| **Backend** | FastAPI, Uvicorn | Async Python API gateway with CORS and multipart support |
-| **Orchestration** | LangGraph, LangChain | Stateful graph execution and conversation checkpoints |
-| **Vector DB** | ChromaDB | Persistent local vector store for semantic timeline search |
-| **Embeddings** | SentenceTransformers (`BAAI/bge-base-en-v1.5`) | Dense text embeddings |
-| **LLM Engine** | Google Gemma 4 / Gemini API | Advanced reasoning and grounded generation |
-| **Speech** | Web MediaRecorder API, Whisper STT | Browser-native voice capture and audio transcription |
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
 
----
-
-# 📁 Repository Structure
-
-```text
-VIBEWRITE/
-├── backend/
-│   ├── api/
-│   │   └── routes/
-│   │       └── chat.py          # Streaming chat and audio endpoints
-│   ├── core/
-│   │   └── config.py            # Application settings and environment config
-│   ├── scripts/
-│   │   ├── ingest_tweets.py     # Script to embed timeline posts into ChromaDB
-│   │   └── ingest_docs.py       # Document ingestion utilities
-│   ├── services/
-│   │   ├── audio_engine.py      # Audio transcription and processing
-│   │   └── rag_engine.py        # LangGraph workflow, ChromaDB & LLM stream
-│   ├── main.py                  # FastAPI application entry point
-│   ├── requirements.txt         # Python backend dependencies
-│   └── .env.example             # Template for API keys and configuration
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── ChatContainer.jsx  # Primary chat interface & message list
-│   │   │   ├── MessageInput.jsx   # Input bar with voice & file attachment
-│   │   │   └── Sidebar.jsx        # Multi-chat sessions and pinned list
-│   │   ├── App.jsx              # Main React application shell
-│   │   └── index.css            # Tailwind styling rules
-│   ├── package.json             # Node dependencies and scripts
-│   └── vite.config.js           # Vite build configuration
-├── docs/                        # Development logs and verification playbooks
-├── test_bot.py                  # CLI test script for terminal RAG streaming
-└── README.md                    # Project documentation
+# Install core dependencies
+pip install -r requirements.txt
 ```
 
----
-
-# 🚀 Quickstart Guide
-
-### Prerequisites
-- **Python 3.10+**
-- **Node.js 18+** & `npm`
-- **Gemini / Google AI API Key**
-
----
-
-### Backend Setup
-
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   # Windows:
-   .\venv\Scripts\activate
-   # Linux / macOS:
-   source venv/bin/activate
-   ```
-
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Configure environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-   Add your `GEMINI_API_KEY` to `backend/.env`.
-
-5. *(Optional)* Ingest or update timeline data into ChromaDB:
-   ```bash
-   python scripts/ingest_tweets.py
-   ```
-
-6. Start the FastAPI development server:
-   ```bash
-   python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
-   ```
-   Backend will be running at `http://127.0.0.1:8000` (Docs: `http://127.0.0.1:8000/docs`).
-
----
-
-### Frontend Setup
-
-1. Open a new terminal and navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install Node packages:
-   ```bash
-   npm install
-   ```
-
-3. Start the Vite development server:
-   ```bash
-   npm run dev
-   ```
-
-4. Open `http://localhost:5173` in your browser to interact with VIBEWRITE!
-
----
-
-# ⚙️ Configuration
-
-Create a `.env` file in `backend/` with the following variables:
-
+**Environment Configuration**:
+Copy `.env.example` to `.env` and add your API key:
+```bash
+cp .env.example .env
+```
+Inside `backend/.env`:
 ```env
-# Google GenAI / Gemini API Key
 GEMINI_API_KEY=your_gemini_api_key_here
+```
 
-# Application Configuration
-APP_NAME=PersonaTwin.AI
-DEBUG=True
+**Run the API Server**:
+```bash
+python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+```
+The API will be available at `http://127.0.0.1:8000`.
+
+### 2. Frontend Setup
+
+In a new terminal window:
+```bash
+cd frontend
+
+# Install Node dependencies
+npm install
+
+# Start Vite development server
+npm run dev
+```
+Open `http://localhost:5173` in your browser.
+
+---
+
+## 🗄️ Ingesting Timeline Data
+
+To populate the local ChromaDB with the necessary timeline vectors, you must run the ingestion script. The repository expects a source data file named `all_musk_posts.csv` in the root directory.
+
+```bash
+cd backend
+python scripts/ingest_tweets.py
 ```
 
 ---
 
-# 📡 API Reference
+## 🧪 CLI Testing
 
-### `POST /api/chat/stream`
-Handles multimodal conversation streaming using Server-Sent Events.
+You can test the backend pipeline without running the React frontend using the included CLI script:
 
-- **Content-Type**: `multipart/form-data`
-- **Parameters**:
-  - `text` *(string, optional)*: User prompt or message.
-  - `chatId` *(string, required)*: Unique session identifier for memory checkpointing.
-  - `model_requested` *(string, optional)*: Model choice (e.g., `Gemma 4 26B MoE`).
-  - `files` *(binary list, optional)*: Audio recording (`.webm`, `.wav`) or document attachments (`.pdf`, `.txt`, `.md`).
-- **Response**: `text/event-stream` containing sequential token chunks:
-  ```text
-  data: Hello
-  data:  world!
-  data: [DONE]
-  ```
-
-### `POST /api/transcribe`
-Converts raw audio bytes into text.
-
-- **Content-Type**: `multipart/form-data`
-- **Parameters**: `file` (Audio file)
-- **Response**: `{"text": "transcribed string"}`
+```bash
+python test_bot.py
+```
 
 ---
 
-# 📄 License
+## ⚠️ Known Limitations & Status
+
+- **Hardcoded Persona**: While designed conceptually as a "Digital Twin Engine", the current implementation is explicitly hardcoded to the Elon Musk persona. System prompts, ChromaDB collections (`elon_tweets`), and style metrics are deeply coupled to this specific identity.
+- **Dependencies**: 
+  - The repository contains an unused legacy script (`backend/scripts/ingest_docs.py`) targeting Indian Legal PDFs, which is not part of the primary workflow.
+- **Model Aliases**: The backend router accepts requests for "Gemma 4 26B MoE" and "Gemma 4 31B Dense". These are passed as raw identifiers to the Google GenAI SDK. If you do not have access to these specific model weights via your GCP/Gemini account, you may need to adjust the `MODEL_ROUTER` dictionary in `services/rag_engine.py` to standard available models (e.g., `gemini-1.5-pro`).
+- **Voice Transcription**: The STT pipeline requires internet connectivity, as it uses Gemini 1.5 Flash via the GenAI SDK, rather than local Whisper inference.
+
+---
+
+## 📄 License
 
 This project is licensed under the [BSD 3-Clause License](LICENSE).

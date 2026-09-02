@@ -10,3 +10,4 @@ PyMuPDF
 langgraph
 langchain-core
 google-genai
+pandas
