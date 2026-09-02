@@ -1,10 +1,12 @@
 <div align="center">
 
-# 🚀 VIBEWRITE
+# 🚀 VIBEWRIGHT (PersonaTwin.AI)
 
 ### Factually Grounded Elon Musk AI Digital Twin
 
 #### A real-time conversational AI system built to faithfully replicate the voice, technical reasoning, and opinions of Elon Musk, grounded in his historical X (Twitter) timeline using Retrieval-Augmented Generation (RAG) and LangGraph.
+
+### 🎥 [Watch the Live Demo & Pitch Video Here](https://drive.google.com/drive/folders/1EibN3f_KXpm2IH3N51PIC2vmBicsyOAH?usp=sharing)
 
 <p>
 
@@ -22,9 +24,37 @@
 
 ---
 
-## 📖 Project Overview
+# 📑 Table of Contents
 
-**VIBEWRITE** is a real-time conversational AI architecture designed to emulate a persona digital twin—specifically engineered for **Elon Musk**. Rather than relying purely on pre-trained LLM weights which often lead to caricatures or hallucinations, VIBEWRITE grounds its responses in a dense vector database of actual historical timeline posts.
+- [Project Overview](#-project-overview)
+- [Core Features](#-features)
+- [System Architecture](#-system-architecture)
+- [How It Works](#-how-it-works)
+  - [Timeline Vector Ingestion](#1-timeline-vector-ingestion)
+  - [LangGraph Retrieval Pipeline](#2-langgraph-retrieval-pipeline)
+  - [Model Routing & Generation](#3-model-routing--generation)
+  - [Real-Time SSE Streaming](#4-real-time-sse-streaming)
+- [Tech Stack](#-tech-stack)
+- [Repository Structure](#-repository-structure)
+- [Quickstart Guide](#-quickstart-guide)
+  - [Prerequisites](#prerequisites)
+  - [Backend Setup](#backend-setup)
+  - [Frontend Setup](#frontend-setup)
+- [Configuration](#-configuration)
+- [API Reference](#-api-reference)
+- [License](#-license)
+
+---
+
+# 📖 Project Overview
+
+**VIBEWRIGHT (PersonaTwin.ai)** is a highly authentic, interactive digital twin of Elon Musk, designed to dynamically simulate his unique conversational style and first-principles mental models. At its core, the application leverages an advanced Retrieval-Augmented Generation (RAG) pipeline powered by ChromaDB, which ingests a massive dataset of historical tweets. This allows the AI to ground its answers strictly in actual past statements rather than hallucinating facts. 
+
+To ensure absolute tonal accuracy, the system introduces dynamic "Vibe Modes"—allowing users to seamlessly switch between the punchy, meme-heavy "X Mode," the hardcore engineering depth of "First Principles," and the expansive, philosophical "Visionary" scale. 
+
+The architecture is built on a high-performance FastAPI backend integrated with LangGraph for state management, while **Swytchcode** serves as the robust execution layer orchestrating Google's powerful Gemini models. To handle novel or current events, the application features an intelligent DuckDuckGo factual search fallback, smoothly blending real-time knowledge into the conversation without falsely attributing it to the persona’s past. 
+
+Crucially, we implemented an autonomous "Persona Critic" mechanism. Before streaming the response to our sleek, responsive React frontend, a secondary LLM evaluates the candidate output for stylistic consistency, appropriate length, and historical accuracy—automatically triggering revisions if the response feels like a forced caricature. The result is a profoundly realistic, voice-enabled AI companion.
 
 It combines semantic retrieval via ChromaDB, stateful conversation orchestration via LangGraph, dynamic factual fallback via DuckDuckGo, and a rigorous "Persona Critic" evaluation step to ensure responses remain contextually accurate, factually grounded, and stylistically authentic.
 
@@ -101,12 +131,14 @@ UI --> User
 
 ---
 
-## 🚀 Quickstart Guide
+### 3. Model Routing & Generation via Swytchcode
+The backend executes calls to Google's Gemini/Gemma models using **Swytchcode** as the robust execution integration layer. Before the response is finalized, an autonomous **Persona Critic** evaluates the candidate generation for tone, length, and historical accuracy, triggering a revision loop if the response fails stylistic checks. 
 
-### Prerequisites
-- **Python 3.10+**
-- **Node.js 18+** & `npm`
-- **Google Gemini API Key**
+### 4. External Factual Search (DuckDuckGo Fallback)
+If the query involves current events or topics outside the persona's dataset (determined by knowledge confidence scoring), a lightweight DuckDuckGo Lite search is triggered to inject real-time facts into the context, without falsely claiming the persona previously knew them.
+
+### 5. Real-Time SSE Streaming
+Responses are streamed incrementally over HTTP using Server-Sent Events (`text/event-stream`), delivering low latency and immediate UI updates.
 
 ### 1. Backend Setup
 
